@@ -16,5 +16,10 @@ namespace TestModulET7017
         {
             InitializeComponent();
         }
+
+        private void butDiapozon_Click(object sender, EventArgs e)
+        {
+            /// Включает реле и изменяет диапазон измерения
+        }
     }
 }
