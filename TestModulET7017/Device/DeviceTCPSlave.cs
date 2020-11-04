@@ -28,9 +28,9 @@ namespace TestModulET7017
         bool NetworkIsOk = false;               // флаг на определение подключения
         Timer timer1 = null;
 
-        byte _slave = 0;
-        ushort _startAddress = 0;
-        ushort _numOfPoints = 0;
+        //byte _slave = 0;
+        //ushort _startAddress = 0;
+        //ushort _numOfPoints = 0;
 
         ushort _registerAddressSr = 0;
         ushort _valueSr = 0;
@@ -38,7 +38,7 @@ namespace TestModulET7017
         ushort[] readInputRegisters; // чтение регистров
         bool[] reedDiscreteInputs; // чтение дискретных значений
 
-        byte _whatReed = 100; // передаваемое значение для чтение регистров
+        //byte _whatReed = 100; // передаваемое значение для чтение регистров
 
 
         string messageConnect = "Состояние подключения к приборам";
@@ -46,6 +46,8 @@ namespace TestModulET7017
         sbyte isconnect = -10;
 
         #region Свойства для общения с внешним миром
+
+        
 
         /// <summary>
         /// tcpPort - 502 /TCP,UDP	используется в Modbus
@@ -83,8 +85,26 @@ namespace TestModulET7017
                 isconnect = value;
             }
         }
-        #endregion
 
+        /// <summary>
+        /// Метод вызова для подключения к сети по TCP
+        /// </summary>
+        /// <param name="WhatReeder"> 0 - Coils (0xxxx); 1 - Discrete Inputs (1xxxx); 3 -  Input Register (3xxxx); 4 - Holding Register (4xxxx)</param>
+        /// <param name="Slave"> Адресс устройства в TCP MODBUS</param>
+        /// <param name="IpAddress"> ip адресс устройства</param>
+        /// <param name="NumOfPoints"> количество читаемых параметров </param>
+        public void Start_Connect(string IpAddress, byte Slave)
+        {
+            _ipAddress = IpAddress;          // ipAddress устройства для подключения
+            _slave = Slave;                 // Адресс устройства
+            NetworkIsOk = Connect();
+
+            TimerCallback tm = new TimerCallback(timer1_Tick);
+            timer1 = new Timer(tm, 0, 0, 1000);
+
+        }
+
+        /*
 
         /// <summary>
         /// Метод вызова для подключения к сети по TCP
@@ -108,6 +128,99 @@ namespace TestModulET7017
             timer1 = new Timer(tm, 0, 0, 1000);
             
         }
+        */
+
+        #endregion
+
+        #region Function Code Descriptions
+        /*
+         *  Discrete Input      Single bit      Read-Only   DI
+            Coils               Single bit      Read-Write  DO
+            Input Registers     16-bits word    Read-Only   AI  
+            Holding Registers   16-bits word    Read-Write  AO
+         */
+
+
+
+        /// <summary>
+        /// Метод для считывания состояния дискретного выхода в модуле (DO -на модуле, сигнал от модуля)
+        /// Read Coil Status ()
+        /// </summary>
+        /// <param name="slaveID">Address of device to read values from</param>
+        /// <param name="startAddress">Address to begin reading</param>
+        /// <param name="numOfPoints">Number of coils to read</param>
+        /// <returns> bool[] </returns>
+        public bool[] ReadCoils(byte slaveID, ushort startAddress, ushort numOfPoints) // функциональный код 01
+        {
+            return master.ReadCoils(slaveID, startAddress, numOfPoints);
+        }
+
+        /// <summary>
+        /// Метод для считывания состояния дискретного входа (DI - на модуле, сигнал из вне)
+        /// Read Discrete Inputs
+        /// </summary>
+        /// <param name="slaveID">Address of device to read values from</param>
+        /// <param name="startAddress">Address to begin reading.</param>
+        /// <param name="numOfPoints">Number of discrete inputs to read.</param>
+        /// <returns> bool[] </returns>
+        public bool[] ReadInputs(byte slaveID, ushort startAddress, ushort numOfPoints) //  функциональный код 02
+        {
+            return master.ReadInputs(slaveID, startAddress, numOfPoints);
+        }
+
+        /// <summary>
+        ///  Метод для считывния содержимого с регистров выхода (AO - на модуле, сигнал от модуля )
+        ///  Read holding registers value
+        /// </summary>
+        /// <param name="slaveID">Address of device to read values from</param>
+        /// <param name="startAddress">Address to begin reading.</param>
+        /// <param name="numOfPoints">Number of holding registers to read</param>
+        /// <returns> ushort[] </returns>
+        public ushort[] ReadHoldingRegistr(byte slaveID, ushort startAddress, ushort numOfPoints) // функциональный код 03
+        {
+            return master.ReadHoldingRegisters(slaveID, startAddress, numOfPoints);
+        }
+
+        /// <summary>
+        /// Метод для чтения содержимого регистров входных (AI - на модуле, сигнал к модулю)
+        /// Read input registers value
+        /// </summary>
+        /// <param name="slaveID">Address of device to read values from</param>
+        /// <param name="startAddress">Address to begin reading</param>
+        /// <param name="numOfPoints">Number of input registers to read.</param>
+        /// <returns>ushort[].</returns>
+        public ushort[] ReadInputRegisters(byte slaveID, ushort startAddress, ushort numOfPoints) // функциональный код 04
+        {
+            return master.ReadInputRegisters(slaveID, startAddress, numOfPoints);
+        }
+
+        /// <summary>
+        /// Метод для записи значений в регистры  дискретного выхода в модуле (DO -на модуле, сигнал от модуля)
+        /// Write a coil value
+        /// </summary>
+        /// <param name="slaveID">Address of the device to write to</param>
+        /// <param name="registerAddress">Address to write value to</param>
+        /// <param name="value"> If the address is going to be written, the value is TRUE. /// If the address isn’t going to be written, the value is FALSE </param>
+        public void WriteSingleCoil(byte slaveID, ushort registerAddress, bool value) // функциональный код 05
+        {
+            master.WriteSingleCoil(slaveID, registerAddress, value);
+        }
+
+        /// <summary>
+        /// Метод для записи значений в регистры  выхода (AO - на модуле, сигнал от модуля
+        /// </summary>
+        /// <param name="slaveID"> Address of the device to write to </param>
+        /// <param name="registerAddress"> Address to write value to </param>
+        /// <param name="value"> Value to write </param>
+        public void WriteSingleRegister(byte slaveID, ushort registerAddress, ushort value) // функциональный код 06
+        {
+            master.WriteSingleRegister(slaveID, registerAddress, value);
+        }
+
+
+        #endregion
+
+
 
         /// <summary>
         /// Метод для чтения значений регистров в модуле
@@ -127,7 +240,6 @@ namespace TestModulET7017
             }
             
         }
-
         public bool[] ReedDiscreteInputs
         {
             get
@@ -158,44 +270,33 @@ namespace TestModulET7017
 
 
 
+
+
         private void timer1_Tick(object state)
         {
             //Включение таймера timer1, опрос с периодичностью в 1000 мс
             try
             {
+                #region Master to Slave
                 if (NetworkIsOk)
                 {
-                    switch (_whatReed)
-                    {
-                        case 0:
-                            {
-                                break;
-                            }
-                        case 1:
-                            {
-                                //Чтениие дискретных выходов
-                                ReedDiscreteInputs = master.ReadInputs(_slave, _startAddress, _numOfPoints); // Discrete Inputs (1xxxx)
-                                break;
-                            }
-                        case 3:
-                            {
-                                // чтение входов и выходов
-                                ReadInputRegister = master.ReadInputRegisters(_slave, _startAddress, _numOfPoints); // Input Register (3xxxx)
-                                break;
-                            }
-                        default:
-                            break;
-                    }
-                    
 
-                    
+                     //Чтениие дискретных выходов
+                     ReedDiscreteInputs = master.ReadInputs(_slave, _startAddress, _numOfPoints); // Discrete Inputs (1xxxx)
+                     // чтение входов и выходов
+                     ReadInputRegister = master.ReadInputRegisters(_slave, _startAddress, _numOfPoints); // Input Register (3xxxx)
+
+
+
 
                     // Запись значения регистра в модуль
-                   // master.WriteSingleRegister(_registerAddressSr, _valueSr); // Holding Register (4xxxx)
+                    // master.WriteSingleRegister(_registerAddressSr, _valueSr); // Holding Register (4xxxx)
+
+                   
 
                     IsConnect = 0;
                 }
-
+                #endregion
                 else
                 {
                     // повторное подключение
