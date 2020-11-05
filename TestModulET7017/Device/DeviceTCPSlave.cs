@@ -28,7 +28,7 @@ namespace TestModulET7017
         bool NetworkIsOk = false;               // флаг на определение подключения
         Timer timer1 = null;
 
-        //byte _slave = 0;
+        byte _slave = 0;    // адресс устройство
         //ushort _startAddress = 0;
         //ushort _numOfPoints = 0;
 
@@ -89,10 +89,8 @@ namespace TestModulET7017
         /// <summary>
         /// Метод вызова для подключения к сети по TCP
         /// </summary>
-        /// <param name="WhatReeder"> 0 - Coils (0xxxx); 1 - Discrete Inputs (1xxxx); 3 -  Input Register (3xxxx); 4 - Holding Register (4xxxx)</param>
         /// <param name="Slave"> Адресс устройства в TCP MODBUS</param>
         /// <param name="IpAddress"> ip адресс устройства</param>
-        /// <param name="NumOfPoints"> количество читаемых параметров </param>
         public void Start_Connect(string IpAddress, byte Slave)
         {
             _ipAddress = IpAddress;          // ipAddress устройства для подключения
@@ -165,7 +163,7 @@ namespace TestModulET7017
         /// <returns> bool[] </returns>
         public bool[] ReadInputs(byte slaveID, ushort startAddress, ushort numOfPoints) //  функциональный код 02
         {
-            return master.ReadInputs(slaveID, startAddress, numOfPoints);
+            return NetworkIsOk ? master.ReadInputs(slaveID, startAddress, numOfPoints)  : null;
         }
 
         /// <summary>
@@ -178,7 +176,7 @@ namespace TestModulET7017
         /// <returns> ushort[] </returns>
         public ushort[] ReadHoldingRegistr(byte slaveID, ushort startAddress, ushort numOfPoints) // функциональный код 03
         {
-            return master.ReadHoldingRegisters(slaveID, startAddress, numOfPoints);
+            return NetworkIsOk ? master.ReadHoldingRegisters(slaveID, startAddress, numOfPoints) : null;
         }
 
         /// <summary>
@@ -188,10 +186,10 @@ namespace TestModulET7017
         /// <param name="slaveID">Address of device to read values from</param>
         /// <param name="startAddress">Address to begin reading</param>
         /// <param name="numOfPoints">Number of input registers to read.</param>
-        /// <returns>ushort[].</returns>
+        /// <returns> ushort[] </returns>
         public ushort[] ReadInputRegisters(byte slaveID, ushort startAddress, ushort numOfPoints) // функциональный код 04
         {
-            return master.ReadInputRegisters(slaveID, startAddress, numOfPoints);
+            return NetworkIsOk ? master.ReadInputRegisters(slaveID, startAddress, numOfPoints) : null;
         }
 
         /// <summary>
@@ -201,9 +199,19 @@ namespace TestModulET7017
         /// <param name="slaveID">Address of the device to write to</param>
         /// <param name="registerAddress">Address to write value to</param>
         /// <param name="value"> If the address is going to be written, the value is TRUE. /// If the address isn’t going to be written, the value is FALSE </param>
-        public void WriteSingleCoil(byte slaveID, ushort registerAddress, bool value) // функциональный код 05
+        /// <returns> true - if the operation was successful, else - false </returns>
+        public bool WriteSingleCoil(byte slaveID, ushort registerAddress, bool value) // функциональный код 05
         {
-            master.WriteSingleCoil(slaveID, registerAddress, value);
+            if (NetworkIsOk)
+            {
+                master.WriteSingleCoil(slaveID, registerAddress, value);
+                return true; //Запись успешна произведена
+            }
+            else
+            {
+                return false; //запись не произведена
+            }
+           
         }
 
         /// <summary>
@@ -212,16 +220,26 @@ namespace TestModulET7017
         /// <param name="slaveID"> Address of the device to write to </param>
         /// <param name="registerAddress"> Address to write value to </param>
         /// <param name="value"> Value to write </param>
-        public void WriteSingleRegister(byte slaveID, ushort registerAddress, ushort value) // функциональный код 06
+        /// <returns> true - if the operation was successful, else - false </returns>
+        public bool WriteSingleRegister(byte slaveID, ushort registerAddress, ushort value) // функциональный код 06
         {
-            master.WriteSingleRegister(slaveID, registerAddress, value);
+            if (NetworkIsOk)
+            {
+                master.WriteSingleRegister(slaveID, registerAddress, value);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+           
         }
 
 
         #endregion
 
 
-
+        /*
         /// <summary>
         /// Метод для чтения значений регистров в модуле
         /// </summary>
@@ -267,7 +285,7 @@ namespace TestModulET7017
             _valueSr = Value;
         }
 
-
+    */
 
 
 
@@ -280,19 +298,12 @@ namespace TestModulET7017
                 #region Master to Slave
                 if (NetworkIsOk)
                 {
+                    //чтение входов и выходов
 
                      //Чтениие дискретных выходов
-                     ReedDiscreteInputs = master.ReadInputs(_slave, _startAddress, _numOfPoints); // Discrete Inputs (1xxxx)
+                   //  ReedDiscreteInputs = master.ReadInputs(_slave, _startAddress, _numOfPoints); // Discrete Inputs (1xxxx)
                      // чтение входов и выходов
-                     ReadInputRegister = master.ReadInputRegisters(_slave, _startAddress, _numOfPoints); // Input Register (3xxxx)
-
-
-
-
-                    // Запись значения регистра в модуль
-                    // master.WriteSingleRegister(_registerAddressSr, _valueSr); // Holding Register (4xxxx)
-
-                   
+                  //   ReadInputRegister = master.ReadInputRegisters(_slave, _startAddress, _numOfPoints); // Input Register (3xxxx)
 
                     IsConnect = 0;
                 }
@@ -372,9 +383,5 @@ namespace TestModulET7017
             }
         }
 
-        #region Чтение и запись регистров
-        
-
-        #endregion
     }
 }

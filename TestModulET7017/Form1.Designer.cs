@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.butDiapozon = new System.Windows.Forms.Button();
+            this.butRangeMax = new System.Windows.Forms.Button();
             this.textValue = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -45,20 +45,21 @@
             this.checkBoxChanel4 = new System.Windows.Forms.CheckBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelConnect = new System.Windows.Forms.ToolStripStatusLabel();
-            this.timerOprosa = new System.Windows.Forms.Timer(this.components);
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.timerOprosa = new System.Windows.Forms.Timer(this.components);
+            this.butRangeMin = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // butDiapozon
+            // butRangeMax
             // 
-            this.butDiapozon.Location = new System.Drawing.Point(114, 179);
-            this.butDiapozon.Name = "butDiapozon";
-            this.butDiapozon.Size = new System.Drawing.Size(144, 40);
-            this.butDiapozon.TabIndex = 0;
-            this.butDiapozon.Text = "Переключение диапозона";
-            this.butDiapozon.UseVisualStyleBackColor = true;
-            this.butDiapozon.Click += new System.EventHandler(this.butDiapozon_Click);
+            this.butRangeMax.Location = new System.Drawing.Point(173, 206);
+            this.butRangeMax.Name = "butRangeMax";
+            this.butRangeMax.Size = new System.Drawing.Size(85, 30);
+            this.butRangeMax.TabIndex = 0;
+            this.butRangeMax.Text = "Range Max";
+            this.butRangeMax.UseVisualStyleBackColor = true;
+            this.butRangeMax.Click += new System.EventHandler(this.butRangeMax_Click);
             // 
             // textValue
             // 
@@ -95,6 +96,7 @@
             this.textBoxMinRange.Name = "textBoxMinRange";
             this.textBoxMinRange.Size = new System.Drawing.Size(49, 20);
             this.textBoxMinRange.TabIndex = 4;
+            this.textBoxMinRange.Text = "val";
             // 
             // textBoxMaxRange
             // 
@@ -190,10 +192,6 @@
             this.toolStripStatusLabelConnect.Size = new System.Drawing.Size(148, 17);
             this.toolStripStatusLabelConnect.Text = "Состояние подключения ";
             // 
-            // timerOprosa
-            // 
-            this.timerOprosa.Tick += new System.EventHandler(this.timerOprosa_Tick);
-            // 
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -203,11 +201,26 @@
             this.toolStripDropDownButton1.Size = new System.Drawing.Size(29, 20);
             this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
             // 
+            // timerOprosa
+            // 
+            this.timerOprosa.Tick += new System.EventHandler(this.timerOprosa_Tick);
+            // 
+            // butRangeMin
+            // 
+            this.butRangeMin.Location = new System.Drawing.Point(173, 171);
+            this.butRangeMin.Name = "butRangeMin";
+            this.butRangeMin.Size = new System.Drawing.Size(85, 30);
+            this.butRangeMin.TabIndex = 14;
+            this.butRangeMin.Text = "Range Min";
+            this.butRangeMin.UseVisualStyleBackColor = true;
+            this.butRangeMin.Click += new System.EventHandler(this.butRangeMin_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(270, 261);
+            this.Controls.Add(this.butRangeMin);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.checkBoxChanel4);
             this.Controls.Add(this.checkBoxChanel3);
@@ -221,7 +234,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textValue);
-            this.Controls.Add(this.butDiapozon);
+            this.Controls.Add(this.butRangeMax);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -234,7 +247,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button butDiapozon;
+        private System.Windows.Forms.Button butRangeMax;
         private System.Windows.Forms.TextBox textValue;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
@@ -251,6 +264,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelConnect;
         private System.Windows.Forms.Timer timerOprosa;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.Button butRangeMin;
     }
 }
 

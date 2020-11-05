@@ -20,9 +20,22 @@ namespace TestModulET7017
             InitializeComponent();
         }
 
-        private void butDiapozon_Click(object sender, EventArgs e)
+        private void butRangeMax_Click(object sender, EventArgs e)
         {
-            /// Включает реле и изменяет диапазон измерения
+            // Включает реле и изменяет диапазон измерения
+            if (!et7017.VklHighRange())
+            {
+                MessageBox.Show("no connection to the module", "Message", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void butRangeMin_Click(object sender, EventArgs e)
+        {
+            //Включает диапазон на 150 мВ
+           if(!et7017.VklLowhRange())
+            {
+                MessageBox.Show("no connection to the module", "Message", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -42,7 +55,68 @@ namespace TestModulET7017
         private void timerOprosa_Tick(object sender, EventArgs e)
         {
             LoockMessage(Convert.ToString(et7017.MessageConnect));
-        }
+            try
+            {
+                checkBoxChanel1.Checked = et7017.DO01;
+                checkBoxChanel2.Checked = et7017.DO02;
+                checkBoxChanel3.Checked = et7017.DO03;
+                checkBoxChanel4.Checked = et7017.DO04;
+
+                label5.ForeColor = System.Drawing.Color.Black;
+                label5.Text = String.Format(@"Состояние дискретных 
+каналов:");
+            }
+
+            catch (MyExaption ex)
+            {
+                label5.ForeColor = System.Drawing.Color.Red;
+                label5.Text = String.Format(@"Невозможно прочитать состояние выходов. 
+               " + ex.Message);
+            }
+            try
+            {
+                textBoxMinRange.Text = Convert.ToString(et7017.RangeAI1[0]);
+                textBoxMaxRange.Text = Convert.ToString(et7017.RangeAI1[1]);
+                switch (et7017.RangeAI1[2])
+                {
+                    case 0:
+                        label3.Text = "Мин. мА";
+                        label4.Text = "Макс. мА";
+                        break;
+                    case 1:
+                        label3.Text = "Мин. мВ";
+                        label4.Text = "Макс. мВ";
+                        break;
+                    case 2:
+                        label3.Text = "Мин. В";
+                        label4.Text = "Макс. В";
+                        break;
+                    default:
+                        label3.Text = "Unknown";
+                        label4.Text = "Unknown";
+                        break;
+                }
+            }
+            catch (MyExaption ex)
+            {
+                label3.Text = "Unknown";
+                label4.Text = "Unknown";
+                textBoxMinRange.Text = "NaN";
+                textBoxMaxRange.Text = "NaN";
+                label2.ForeColor = System.Drawing.Color.Red;
+            }
+
+            try
+            {
+                textValue.Text = String.Format("{.f3}", et7017.AI1);
+            }
+            catch (Exception)
+            {
+
+                textValue.Text = "NaN";
+            }
+            }
+            
 
         private async void LoockMessage(string message)
         {
@@ -53,5 +127,7 @@ namespace TestModulET7017
                 
             }
         }
+
+        
     }
 }

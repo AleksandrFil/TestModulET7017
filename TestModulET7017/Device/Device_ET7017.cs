@@ -10,6 +10,52 @@ using System.Windows.Forms;
 
 namespace TestModulET7017
 {
+    enum DOOtput : ushort
+    {
+        DO01 = 0,
+        DO02 = 1,
+        DO03 = 2,
+        DO04 = 3
+    }
+
+    enum RegistrRange : ushort
+    {
+        Chanel_1 = 427,
+        Chanel_2 = 428,
+        Chanel_3,
+        Chanel_4,
+        Chanel_5,
+        Chanel_6,
+        Chanel_7,
+        Chanel_8
+    }
+
+    enum Range_TableCod : ushort
+    {
+        mA4_20 = 7,
+        V10_10 = 8,
+        V5_5 = 9,
+        V1_1 = 10,
+        mV500_500 = 11,
+        mV150_150 = 12,
+        mA20_20 = 13,
+        mA0_20 = 26
+    }
+
+    enum AIInput : ushort
+    {
+        Chanel_1 = 0,
+        Chanel_2 = 1,
+        Chanel_3,
+        Chanel_4,
+        Chanel_5,
+        Chanel_6,
+        Chanel_7,
+        Chanel_8
+    }
+
+
+
     class Device_ET7017
     {
         static string _ipAddress = "192.168.12.3";     // ip aдресс
@@ -19,7 +65,7 @@ namespace TestModulET7017
         static ushort _numOfPoints = 10;                // Количество регистров читаемых со стартового
 
         ushort _registerAddress = 0;    // регистр для записи
-        ushort _value = 0;              // значение дляч записи
+        ushort _value = 0;              // значение для записи
 
         static ushort potentialP1 = 55000;      // напряжение на ПОСТ1
         static ushort potentialP2 = 55000;      // напряжение на ПОСТ2
@@ -31,9 +77,14 @@ namespace TestModulET7017
         static double _koefPotP1 = 1;           // коеффициент для вольтметра на посту 1
         static double _koefPotP2 = 1;           // коеффициент для вольтметра на посту 2 
 
+        static ushort constantFormat = 65535;   // Значение для диапозона в инженерном формате
+
+
         private Timer timer = null;
-       
+
         DeviceTCPSlave con = new DeviceTCPSlave();
+
+
         #region Чтение параметров модуля из XML
         public Device_ET7017()
         {
@@ -74,8 +125,177 @@ namespace TestModulET7017
 
         #endregion
 
-        #region Чтение значений из модуля
+        #region Working with the module
 
+        /// <summary>
+        /// Метод подключения к сети
+        /// </summary>
+        /// <returns>0- все ок, -1 - нет подключние, -2 - ошибка при подключении </returns>
+        public int Connecting()
+        {
+            con.Start_Connect(_ipAddress, _slave);   //Подключение к сети
+
+            return con.IsConnect;
+        }
+
+        /// <summary>
+        /// Свойства для чтения сообщения о состоянии модуля
+        /// </summary>
+        public string MessageConnect
+        {
+            get { return con.MessageConnect; }
+        }
+
+        #endregion
+
+        #region Methodы Set measuring range
+        /// <summary>
+        /// Метод для включения диапозона на 500 мВ
+        /// </summary>
+        /// <returns></returns>
+        public bool VklHighRange()
+        {
+            if (con.WriteSingleCoil(_slave, (ushort)DOOtput.DO01, true) &&
+                con.WriteSingleRegister(_slave, (ushort)RegistrRange.Chanel_1, (ushort)Range_TableCod.mV500_500))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Метод для включения диапозона на 150 мВ
+        /// </summary>
+        /// <returns></returns>
+        public bool VklLowhRange()
+        {
+            if (con.WriteSingleCoil(_slave, (ushort)DOOtput.DO01, false) && con.WriteSingleRegister(_slave, (ushort)RegistrRange.Chanel_1, (ushort)Range_TableCod.mV150_150))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+        #endregion
+
+        #region Read Discret otput
+
+        public bool DO01
+        {
+            get
+            {
+                if (listDO != null)
+                    return listDO[0];
+                else
+                    throw new MyExaption("Нет соединения с модулем");
+            }
+        }
+        public bool DO02
+        {
+            get
+            {
+                if (listDO != null)
+                    return listDO[1];
+                else
+                    throw new MyExaption("Нет соединения с модулем");
+            }
+        }
+        public bool DO03
+        {
+            get
+            {
+                if (listDO != null)
+                    return listDO[2];
+                else
+                    throw new MyExaption("Нет соединения с модулем");
+            }
+        }
+        public bool DO04
+        {
+            get
+            {
+                if (listDO != null)
+                    return listDO[3];
+                else
+                    throw new MyExaption("Нет соединения с модулем");
+            }
+        }
+        #endregion
+
+        #region Read Analog input
+        public double AI1
+        {
+            get
+            {
+                if (listAI != null)
+                {
+                    // 
+                    return Convert.ToDouble(listAI[0] * RangeAI1[1] / constantFormat);
+                }
+                else
+                    throw new MyExaption("Нет соединения с модулем");
+            }
+        }
+
+        #endregion
+
+        #region Read Range AI
+        /// <summary>
+        /// Метод для создания списка диапазона
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns> 3 цифра: 0 - мА, 1 - мВ, 2 - В </returns>
+        private List<int> RangeValue_table(ushort range)
+        {
+            switch (range)
+            {
+                case (ushort)Range_TableCod.mA0_20:
+                    return new List<int> { 0, 20, 0 };
+                // break;
+                case (ushort)Range_TableCod.mA20_20:
+                    return new List<int> { -20, 20, 0 };
+                case (ushort)Range_TableCod.mA4_20:
+                    return new List<int> { 4, 20, 0 };
+                case (ushort)Range_TableCod.mV150_150:
+                    return new List<int> { -150, 150, 1 };
+                case (ushort)Range_TableCod.mV500_500:
+                    return new List<int> { -500, 500, 1 };
+                case (ushort)Range_TableCod.V10_10:
+                    return new List<int> { -10, 10, 2 };
+                case (ushort)Range_TableCod.V1_1:
+                    return new List<int> { -1, 1, 2 };
+                case (ushort)Range_TableCod.V5_5:
+                    return new List<int> { -5, 5, 2 };
+                default:
+                    throw new MyExaption("За пределами возможных диапазонов");
+            }
+        }
+
+
+        public List<int> RangeAI1 
+        {
+            get
+            {
+                if (listRangeAI != null)
+                {
+                    return RangeValue_table(listRangeAI[0]);
+                }
+                else
+                {
+                    throw new MyExaption("Нет соединения с модулем");
+                }
+                
+            }
+        }
+
+        #endregion
+
+
+
+        private bool [] listDO { get; set; }
+        private ushort [] listAI { get; set; }
+        private ushort [] listRangeAI { get; set; }
         /// <summary>
         /// Опрос значений прочитанных из модуля
         /// </summary>
@@ -85,164 +305,10 @@ namespace TestModulET7017
         {
             if (con.IsConnect >= 0)
             {
-               try
-               {
-                   //ushort[] readReg = Input_Register(_numOfPoints);
-                   ushort[] readReg = con.ReadInputRegister;
-                   if (readReg != null)
-                   {
-                       PotentialP1 = readReg[0];
-                       PotentialP2 = readReg[1];
-                       TokP1 = readReg[2];
-                       TokP2 = readReg[3];
-                   }
-                   else
-                   {
-                       PotentialP1 = 65535;
-                       PotentialP2 = 65535;
-                       TokP1 = 65535;
-                       TokP2 = 65535;
-                   }
-               
-               }
-               catch (Exception ex)
-               {
-                   throw new MyExaption("нет соединения с аналоговым модулем", ex);
-               }
-            }
-
-
-
-        }
-        public string MessageConnect
-        {
-            get { return con.MessageConnect; }
-        }
-
-        /// <summary>
-        /// Значение напряжения ПОСТ1
-        /// </summary>
-        static public ushort PotentialP1
-        {
-            get
-            {
-                if (potentialP1 != 65535 && potentialP2 != 55000)
-                {
-                    return Convert.ToUInt16(potentialP1 * _koefPotP1);
-                }
-                else
-                {
-                    return potentialP1;
-                }
-                
-            }
-            private set
-            {
-                potentialP1 = value;
+                listDO = con.ReadCoils(_slave, (ushort)DOOtput.DO01, (ushort)Enum.GetNames(typeof(DOOtput)).Length);
+                listAI = con.ReadInputRegisters(_slave, (ushort)AIInput.Chanel_1, (ushort)Enum.GetNames(typeof(AIInput)).Length);
+                listRangeAI = con.ReadHoldingRegistr(_slave, (ushort)RegistrRange.Chanel_1, (ushort)Enum.GetNames(typeof(RegistrRange)).Length);
             }
         }
-
-
-        /// <summary>
-        /// Значение напряжения ПОСТ2
-        /// </summary>
-        static public ushort PotentialP2
-        {
-            get
-            {
-                if (potentialP2 != 65535 && potentialP2 != 55000)
-                {
-                    return Convert.ToUInt16(potentialP2 * _koefPotP2);
-                }
-                else
-                {
-                    return potentialP2 ;
-                }
-                
-            }
-            private set
-            {
-                potentialP2 = value;
-            }
-        }
-
-        /// <summary>
-        /// Значение тока ПОСТ1
-        /// </summary>
-        static public ushort TokP1
-        {
-            get
-            {
-                if (tokP1 != 65535 && tokP1 != 55000)
-                {
-                    return Convert.ToUInt16(tokP1 * _koefTokP1);
-                }
-                return tokP1;
-            }
-            private set
-            {
-                tokP1 = value;
-            }
-        }
-
-        /// <summary>
-        /// Значение тока ПОСТ2
-        /// </summary>
-        static public ushort TokP2
-        {
-            get
-            {
-                if (tokP2 != 65535 && tokP2 != 55000)
-                {
-                    return Convert.ToUInt16(tokP2 * _koefTokP2);
-                }
-                return tokP2;
-            }
-            private set
-            {
-                tokP2 = value;
-            }
-        }
-
-        #endregion
-
-
-
-        /// <summary>
-        /// Метод подключения к сети
-        /// </summary>
-        /// <returns>0- все ок, -1 - нет подключние, -2 - ошибка при подключении </returns>
-       public int Connecting()
-        {
-            con.Start_Connect(_ipAddress, _slave, _startAddress, _numOfPoints, 3);                      //Подключение к сети
-          
-                return con.IsConnect; 
-        }
-
-        /*
-        /// <summary>
-        /// Метод чтения регистров
-        /// </summary>
-        /// <param name="StartAddress"></param>
-        /// <param name="NumOfPoints"></param>
-        /// <returns></returns>
-        static private ushort[] Input_Register(ushort numOfPoints)
-        {
-            return con.ReadInputRegister;
-        }
-
-        /// <summary>
-        /// Метод чтения и записи регистров управления
-        /// </summary>
-        /// <param name="RegisterAddress"></param>
-        /// <param name="Value"></param>
-        public void Holding_Register(ushort RegisterAddress, ushort Value)
-        {
-            _registerAddress = RegisterAddress;
-            _value = Value;
-
-            con.WriteSingleRegister(_registerAddress, _value);
-        }
-        */
     }
 }

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ModulTCP>
+  <ET7017 name="ET-7017">
+    <ipAddress>192.168.12.3</ipAddress> <!--Ip адресс для чтения модуля--> 
+    <startAddress>0</startAddress>      <!-- Начальный регистр для чтения Input Register (3xxxx) -->
+    <numOfPoints> 8</numOfPoints>       <!--Количестов читаемых регистров в поле Input Register (3xxxx)-->
+    <slave>3</slave>
+
+    <koefTokP1>1</koefTokP1>
+    <!--Коэффициент для амперметра на посту 1-->
+    <koefTokP2>1</koefTokP2>
+    <!--Коэффициент для амперметра на посту 2-->
+    <koefPotP1>1</koefPotP1>
+    <!--Коэффициент для вольтметра на посту 1-->
+    <koefPotP2>1</koefPotP2>
+    <!--Коэффициент для вольтметра на посту 2-->
+    
+  </ET7017>
+  <ET7050 name="ET-7050">
+    <ipAddress>192.168.255.1</ipAddress>   <!--Ip адресс для чтения модуля-->
+    <startAddress>0</startAddress>      <!-- Начальный регистр для чтения Input Register (3xxxx) -->
+    <numOfPoints> 10</numOfPoints>      <!--Количестов читаемых регистров в поле Input Register (3xxxx)-->
+    <slave>1</slave>
+    
+  </ET7050>
+</ModulTCP>
