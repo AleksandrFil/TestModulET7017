@@ -98,7 +98,7 @@ namespace TestModulET7017
             NetworkIsOk = Connect();
 
             TimerCallback tm = new TimerCallback(timer1_Tick);
-            timer1 = new Timer(tm, 0, 0, 1000);
+            timer1 = new Timer(tm, 0, 0, 500);
 
         }
 
@@ -150,7 +150,7 @@ namespace TestModulET7017
         /// <returns> bool[] </returns>
         public bool[] ReadCoils(byte slaveID, ushort startAddress, ushort numOfPoints) // функциональный код 01
         {
-            return master.ReadCoils(slaveID, startAddress, numOfPoints);
+            return master.ReadCoils(slaveID, startAddress, numOfPoints); // TODO: ошибка при откючении стенда
         }
 
         /// <summary>

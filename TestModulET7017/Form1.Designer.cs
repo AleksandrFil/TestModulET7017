@@ -203,6 +203,7 @@
             // 
             // timerOprosa
             // 
+            this.timerOprosa.Interval = 250;
             this.timerOprosa.Tick += new System.EventHandler(this.timerOprosa_Tick);
             // 
             // butRangeMin

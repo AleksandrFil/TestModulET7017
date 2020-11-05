@@ -4,7 +4,7 @@
     <ipAddress>192.168.12.3</ipAddress> <!--Ip адресс для чтения модуля--> 
     <startAddress>0</startAddress>      <!-- Начальный регистр для чтения Input Register (3xxxx) -->
     <numOfPoints> 8</numOfPoints>       <!--Количестов читаемых регистров в поле Input Register (3xxxx)-->
-    <slave>3</slave>
+    <slave>1</slave>
 
     <koefTokP1>1</koefTokP1>
     <!--Коэффициент для амперметра на посту 1-->

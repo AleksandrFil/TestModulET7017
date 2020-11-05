@@ -117,7 +117,7 @@ namespace TestModulET7017
                 }
             }
             this.timer = new Timer();
-            this.timer.Interval = 1500;
+            this.timer.Interval = 500;
             this.timer.Tick += new EventHandler(timer_Tick);
             this.timer.Enabled = true;
         }
@@ -231,7 +231,7 @@ namespace TestModulET7017
                 if (listAI != null)
                 {
                     // 
-                    return Convert.ToDouble(listAI[0] * RangeAI1[1] / constantFormat);
+                    return Convert.ToDouble((double)listAI[0] * (double)RangeAI1[1] / (double)constantFormat);
                 }
                 else
                     throw new MyExaption("Нет соединения с модулем");

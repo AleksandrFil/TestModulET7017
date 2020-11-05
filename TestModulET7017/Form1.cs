@@ -108,12 +108,12 @@ namespace TestModulET7017
 
             try
             {
-                textValue.Text = String.Format("{.f3}", et7017.AI1);
+                textValue.Text = String.Format("{0:f3}", et7017.AI1);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                textValue.Text = "NaN";
+                textValue.Text = ex.Message;
             }
             }
             
